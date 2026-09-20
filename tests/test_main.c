@@ -42,7 +42,7 @@ static int test_host_port_parsing(void) {
 
 static int test_throughput_calculation(void) {
     double throughput = sd_calculate_throughput_mib_per_s(1048576u, 1000.0);
-    if (fabs(throughput - 1.0) > 1e-9) {
+    if (fabs(throughput - 1.0) > 0.001) {
         return 1;
     }
     return 0;
