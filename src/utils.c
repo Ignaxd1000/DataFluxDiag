@@ -1,6 +1,5 @@
 #include "utils.h"
-
-#include <ctype.h>
+#include "structs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -193,3 +192,9 @@ int sd_parse_positive_int(const char *text, int fallback_value) {
     }
     return (int)value;
 }
+
+int compare_ports(const void *a, const void *b) {
+        const scan_task *task_a = (const scan_task *)a;
+        const scan_task *task_b = (const scan_task *)b;
+        return task_a->port.port_number - task_b->port.port_number;
+    }

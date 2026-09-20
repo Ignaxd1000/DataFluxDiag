@@ -1,6 +1,4 @@
-#ifndef STREAMDIAG_TRANSFER_H
-#define STREAMDIAG_TRANSFER_H
-
+#pragma once
 #include <stdint.h>
 
 /* Constantes del protocolo de transferencia y su encabezado binario */
@@ -18,5 +16,3 @@ typedef struct sd_transfer_header {
 int sd_transfer_run_server(uint16_t port);
 /* Envia un archivo a un host:port */
 int sd_transfer_send_file(const char *host, uint16_t port, const char *file_path);
-
-#endif

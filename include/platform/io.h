@@ -1,6 +1,4 @@
-#ifndef STREAMDIAG_PLATFORM_IO_H
-#define STREAMDIAG_PLATFORM_IO_H
-
+#pragma once
 #include <stddef.h>
 #include <stdint.h>
 
@@ -17,5 +15,3 @@ int sd_io_read(sd_file file, void *buffer, size_t bytes_to_read, size_t *bytes_r
 int sd_io_write(sd_file file, const void *buffer, size_t bytes_to_write, size_t *bytes_written);
 int sd_io_get_size(sd_file file, uint64_t *size_out);
 int sd_io_close(sd_file *file);
-
-#endif

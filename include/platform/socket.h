@@ -1,6 +1,4 @@
-#ifndef STREAMDIAG_PLATFORM_SOCKET_H
-#define STREAMDIAG_PLATFORM_SOCKET_H
-
+#pragma once
 #include <stddef.h>
 #include <stdint.h>
 
@@ -27,4 +25,3 @@ int sd_socket_send_all(sd_socket socket, const uint8_t *data, size_t length);
 int sd_socket_recv_exact(sd_socket socket, uint8_t *data, size_t length);
 int sd_socket_close(sd_socket *socket);
 
-#endif

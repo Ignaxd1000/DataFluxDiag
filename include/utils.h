@@ -1,6 +1,4 @@
-#ifndef STREAMDIAG_UTILS_H
-#define STREAMDIAG_UTILS_H
-
+#pragma once
 #include <stddef.h>
 #include <stdint.h>
 
@@ -29,5 +27,5 @@ uint32_t sd_checksum32(const uint8_t *data, size_t len);
 const char *sd_basename_from_path(const char *path);
 /* Toma una string y devuelve su valor en entero. Si no sirve, devuelve el valor por defecto */
 int sd_parse_positive_int(const char *text, int fallback_value);
-
-#endif
+/* Compara dos puertos para ordenarlos */
+int compare_ports(const void *a, const void *b);
