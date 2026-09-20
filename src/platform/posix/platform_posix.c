@@ -1,7 +1,5 @@
 #include "platform/platform.h"
-
 #include "platform/socket.h"
-
 #include <time.h>
 
 int sd_platform_init(void) {

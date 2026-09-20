@@ -1,5 +1,4 @@
 #include "platform/socket.h"
-
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -12,7 +11,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #include "platform/platform.h"
 
 int sd_socket_global_init(void) {

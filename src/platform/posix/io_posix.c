@@ -1,5 +1,4 @@
 #include "platform/io.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>

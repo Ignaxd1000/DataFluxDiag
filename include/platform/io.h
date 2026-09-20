@@ -10,7 +10,7 @@ typedef struct sd_file {
 
 #define SD_FILE_INVALID ((intptr_t)-1)
 
-/* Portable low-level file I/O wrappers used by diagnostics. */
+/* E/S portable para archivos */
 int sd_io_open_read(const char *path, sd_file *file);
 int sd_io_open_write(const char *path, sd_file *file);
 int sd_io_read(sd_file file, void *buffer, size_t bytes_to_read, size_t *bytes_read);

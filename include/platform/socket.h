@@ -10,7 +10,7 @@ typedef struct sd_socket {
 
 #define SD_SOCKET_INVALID ((intptr_t)-1)
 
-/* Portable TCP IPv4 socket API. */
+/* API portable para sockets TCP IPv4 */
 int sd_socket_global_init(void);
 void sd_socket_global_cleanup(void);
 int sd_socket_resolve_ipv4(const char *host, uint32_t *ipv4_network_order_out);

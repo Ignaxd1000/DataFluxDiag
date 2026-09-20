@@ -1,7 +1,5 @@
 #include "scanner.h"
-
 #include "platform/socket.h"
-
 #include <inttypes.h>
 #include <stdio.h>
 

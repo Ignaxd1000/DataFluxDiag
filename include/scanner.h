@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-/* Sequential TCP IPv4 connect scanner. */
+/* Scanner de puertos TCP secuencial IPv4 (es re lerdo porque no le puse threading pero bueno) */
 int sd_scan_tcp_ports(const char *host,
                       uint16_t start_port,
                       uint16_t end_port,

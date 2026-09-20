@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-/* Executes file read/copy benchmark for one or multiple buffer sizes. */
+/* Ejecuta una prueba de benchmark para leer/copiar un archivo con uno o varios tamaños de buffer. */
 int sd_buffer_benchmark(const char *input_path,
                         const char *copy_output_path,
                         const size_t *buffer_sizes,
