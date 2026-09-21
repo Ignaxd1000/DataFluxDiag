@@ -1,227 +1,482 @@
-# StreamDiag
+# DataFluxDiag
 
-StreamDiag is an academic but practical CLI diagnostics project for Operating Systems concepts: **program-managed buffers**, **low-level file I/O**, and **TCP sockets**.
+DataFluxDiag es una herramienta de diagnóstico para línea de comandos escrita en C11. El proyecto implementa pruebas relacionadas con:
 
-This repository currently provides a Linux/POSIX implementation with a modular architecture that keeps platform-specific code inside dedicated platform layers.
+- Lectura y copia de archivos utilizando buffers administrados por el programa.
+- Escaneo de puertos TCP mediante conexiones IPv4.
+- Transferencia de archivos sobre TCP mediante un protocolo binario simple.
 
-## Scope (current version)
+Actualmente, la implementación utiliza una capa POSIX para archivos, sockets y temporización.
 
-Implemented features:
-- Buffer Diagnostic (read/copy benchmarks with custom dynamic buffer sizes)
-- TCP Socket Scanner (IPv4 TCP connect scanner with timeout)
-- TCP File Transfer (custom simple protocol over TCP)
+## Estado actual
 
-Out of scope by design:
-- pipes
-- FTP
-- UDP
-- IPv6
-- GUI
-- raw sockets
-- packet capture/crafting
-- encryption/authentication
-- databases/daemons
-- advanced Nmap-like features
+### Funcionalidades implementadas
 
-## Platform support
+- Benchmark de lectura de archivos con distintos tamaños de buffer.
+- Benchmark de copia de archivos con distintos tamaños de buffer.
+- Escaneo de puertos TCP IPv4.
+- Conexiones TCP con medición de latencia.
+- Detección de puertos abiertos, cerrados y con timeout.
+- Transferencia de archivos entre cliente y servidor.
+- Modo interactivo mediante un menú.
+- Interfaz de línea de comandos.
+- Pruebas offline para las funciones auxiliares y parsers.
 
-- ✅ Linux/POSIX: implemented and buildable
-- ⏳ Windows: **intentionally deferred for a future release**
+### Funcionalidades no implementadas
 
-When compiling for Windows, CMake fails explicitly with a clear message to avoid ambiguous partial support.
+- Soporte para Windows.
+- UDP.
+- IPv6.
+- FTP.
+- GUI.
+- Raw sockets.
+- Captura o creación de paquetes.
+- Cifrado y autenticación.
+- Transferencias reanudables.
+- Servicios o daemons.
+- Funcionalidades avanzadas similares a Nmap.
 
-## Build requirements
+## Compatibilidad
 
-- CMake >= 3.16
-- C compiler with C11 support (GCC/Clang tested on Linux)
+- **Linux/POSIX:** implementado.
+- **Windows:** no implementado actualmente.
 
-## Build
+El soporte para Windows está preparado como una futura capa de plataforma, pero los archivos correspondientes generan un error de compilación intencional:
 
-### Linux
+```text
+Windows backend is planned for a future release and is not implemented yet.
+```
+
+## Requisitos
+
+- CMake 3.16 o superior.
+- Compilador compatible con C11.
+- Sistema operativo Linux/POSIX.
+
+El proyecto utiliza:
+
+- `-Wall`
+- `-Wextra`
+- `-Wpedantic`
+
+en compiladores que no sean MSVC.
+
+## Compilación
 
 ```bash
 cmake -S . -B build
 cmake --build build
 ```
 
-### Windows (current state)
+El ejecutable generado se encuentra normalmente en:
 
 ```bash
-cmake -S . -B build
-cmake --build build --config Release
+./build/datafluxdiag
 ```
 
-This currently fails intentionally with:
-
-> Windows support is planned for a future release and is intentionally not implemented yet.
-
-## CLI
-
-### Interactive mode
-
-Run without arguments:
+Las pruebas se compilan por defecto. Para deshabilitarlas:
 
 ```bash
-./build/streamdiag
+cmake -S . -B build -DDATAFLUXDIAG_BUILD_TESTS=OFF
+cmake --build build
 ```
 
-Menu:
+## Uso
+
+### Ayuda
+
+```bash
+./build/datafluxdiag --help
+```
+
+La ayuda incorporada muestra los comandos disponibles:
 
 ```text
-StreamDiag
+streamdiag --help
+streamdiag buffer benchmark <file> [--copy-out <file>] [--buffers <list>]
+streamdiag scan <host> <start-end> [--timeout <ms>]
+streamdiag server --port <port>
+streamdiag send <host:port> <file>
+```
+
+> Nota: el nombre del ejecutable generado por CMake es `datafluxdiag`, aunque los mensajes de ayuda todavía utilizan el nombre `streamdiag`.
+
+### Modo interactivo
+
+Si el programa se ejecuta sin argumentos, muestra un menú interactivo:
+
+```bash
+./build/datafluxdiag
+```
+
+Menú disponible:
+
+```text
+========================================
+             StreamDiag
+========================================
 1. Buffer Diagnostic
 2. TCP Socket Scanner
 3. TCP File Transfer
 0. Exit
 ```
 
-### Help
+El modo interactivo permite:
+
+1. Ejecutar un benchmark de buffers.
+2. Escanear un rango de puertos TCP.
+3. Iniciar un servidor o enviar un archivo.
+4. Salir del programa.
+
+## Diagnóstico de buffers
+
+### Sintaxis
 
 ```bash
-./build/streamdiag --help
+./build/datafluxdiag buffer benchmark <archivo> [opciones]
 ```
 
-### Commands
+Opciones disponibles:
 
-#### Buffer benchmark
+```text
+--copy-out <archivo>
+--buffers <lista_o_rango>
+```
+
+### Ejemplos
+
+Benchmark de lectura usando el buffer predeterminado:
 
 ```bash
-./build/streamdiag buffer benchmark <file> [--copy-out <output_file>] [--buffers <list_or_range>]
+./build/datafluxdiag buffer benchmark data.bin
 ```
 
-Examples:
+Benchmark con varios tamaños de buffer:
 
 ```bash
-./build/streamdiag buffer benchmark data.bin
-./build/streamdiag buffer benchmark data.bin --buffers 512,1024,4096,65536
-./build/streamdiag buffer benchmark data.bin --buffers 1024-65536:1024
-./build/streamdiag buffer benchmark input.bin --copy-out output.bin --buffers 4096,16384,65536
+./build/datafluxdiag buffer benchmark data.bin \
+  --buffers 512,1024,4096,65536
 ```
 
-Output includes:
-- file size
-- selected buffer size
-- operation count
-- bytes processed
-- elapsed time
-- throughput (MiB/s)
-
-Default buffer size (if not provided): **65536 bytes**.
-
-#### TCP scanner
+Benchmark utilizando un rango:
 
 ```bash
-./build/streamdiag scan <host_or_ipv4> <start-end> [--timeout <ms>]
+./build/datafluxdiag buffer benchmark data.bin \
+  --buffers 1024-65536:1024
 ```
 
-Example:
+Benchmark de lectura y copia:
 
 ```bash
-./build/streamdiag scan 127.0.0.1 20-100 --timeout 750
+./build/datafluxdiag buffer benchmark input.bin \
+  --copy-out output.bin \
+  --buffers 4096,16384,65536
 ```
 
-Each port reports:
-- OPEN
-- CLOSED
-- TIMEOUT
-- latency when available
+### Formato de tamaños de buffer
 
-> Authorization warning: only scan hosts and networks you are authorized to test.
+Lista de tamaños:
 
-#### TCP file transfer
+```text
+512,1024,4096
+```
 
-Server:
+Rango con paso:
+
+```text
+1024-65536:1024
+```
+
+Un rango sin paso utiliza como paso el valor inicial:
+
+```text
+1024-4096
+```
+
+El tamaño predeterminado es:
+
+```text
+65536 bytes
+```
+
+El tamaño máximo permitido es:
+
+```text
+67108864 bytes
+```
+
+equivalente a 64 MiB.
+
+### Resultados
+
+El benchmark muestra:
+
+- Tamaño del archivo.
+- Tipo de operación: `READ` o `COPY`.
+- Tamaño del buffer.
+- Cantidad de operaciones de lectura.
+- Tiempo transcurrido en milisegundos.
+- Rendimiento en MiB/s.
+
+Ejemplo de formato de salida:
+
+```text
+BUFFER DIAGNOSTIC
+----------------------------------------
+File: data.bin
+Size: 1048576 bytes
+Operation: READ
+
+Buffer       Operations     Time(ms)   MiB/s
+65536        16              2.341      427.166
+```
+
+## Escáner de puertos TCP
+
+### Sintaxis
 
 ```bash
-./build/streamdiag server --port 5000
+./build/datafluxdiag scan <host> <inicio-fin> [--timeout <ms>]
 ```
 
-Client:
+### Ejemplo
 
 ```bash
-./build/streamdiag send 127.0.0.1:5000 archivo.bin
+./build/datafluxdiag scan 127.0.0.1 20-100 --timeout 750
 ```
 
-## Transfer protocol
+El escáner:
 
-Simple custom TCP protocol (not FTP):
+- Resuelve el host a una dirección IPv4.
+- Crea una tarea por puerto.
+- Ejecuta las conexiones utilizando hilos C11.
+- Intenta establecer conexiones TCP.
+- Mide la latencia.
+- Ordena los resultados por número de puerto.
 
-1. Fixed binary header (network order):
-   - `magic` (u32): `SDTF`
-   - `version` (u16): `1`
-   - `filename_length` (u16)
-   - `file_size` (u64)
-2. Filename bytes (`filename_length`)
-3. File bytes (`file_size`)
-4. Server sends 1-byte completion ACK (`1` success, `0` failure)
+Cada puerto puede aparecer con uno de estos estados:
 
-The server stores data as `received_<basename>` and validates `received_bytes == expected_file_size`.
+- `OPEN`
+- `CLOSED`
+- `TIMEOUT`
 
-## Architecture
+La salida incluye la latencia en milisegundos cuando está disponible:
+
+```text
+SOCKET SCANNER
+----------------------------------------
+Host: 127.0.0.1
+Protocol: TCP (IPv4)
+Ports: 20-100
+Timeout: 750 ms
+
+PORT       STATE      LATENCY
+20         CLOSED     0.231 ms
+22         OPEN       0.487 ms
+80         CLOSED     0.198 ms
+```
+
+> Importante: la implementación actual del trabajador del escáner utiliza internamente un timeout fijo de 1000 ms. El valor recibido mediante `--timeout` se muestra y se valida desde la CLI, pero actualmente no modifica ese valor interno.
+
+> Utiliza el escáner únicamente contra hosts y redes que tengas autorización para analizar.
+
+## Transferencia de archivos TCP
+
+La transferencia utiliza un cliente y un servidor propios que se comunican mediante TCP IPv4.
+
+### Iniciar el servidor
+
+```bash
+./build/datafluxdiag server --port 5000
+```
+
+El servidor:
+
+1. Escucha en el puerto indicado.
+2. Acepta una conexión de cliente.
+3. Recibe y valida la cabecera.
+4. Recibe el nombre del archivo.
+5. Crea un archivo con el prefijo `received_`.
+6. Recibe los datos en bloques de 65536 bytes.
+7. Envía un ACK de un byte al cliente.
+
+El servidor acepta una conexión por ejecución.
+
+### Enviar un archivo
+
+```bash
+./build/datafluxdiag send 127.0.0.1:5000 archivo.bin
+```
+
+El cliente:
+
+1. Abre el archivo local.
+2. Obtiene su tamaño.
+3. Se conecta al servidor.
+4. Envía la cabecera y el nombre base del archivo.
+5. Envía el contenido en bloques de 65536 bytes.
+6. Muestra el progreso cada 10%.
+7. Espera la confirmación del servidor.
+8. Muestra latencia, bytes enviados, tiempo y rendimiento.
+
+Ejemplo de salida:
+
+```text
+Progress: 10%
+Progress: 20%
+Progress: 30%
+...
+Transfer completed
+Connection latency: 0.421 ms
+Bytes sent: 1048576
+Elapsed: 12.832 ms
+Throughput: 77.929 MiB/s
+```
+
+## Protocolo de transferencia
+
+El protocolo utiliza una cabecera binaria con los siguientes campos, enviados en orden de red:
+
+| Campo | Tipo | Descripción |
+|---|---:|---|
+| `magic` | `u32` | Valor `SDTF` |
+| `version` | `u16` | Versión del protocolo, actualmente `1` |
+| `filename_length` | `u16` | Longitud del nombre del archivo |
+| `file_size` | `u64` | Tamaño del archivo en bytes |
+
+Después de la cabecera se envían:
+
+1. Los bytes del nombre del archivo.
+2. Los bytes del contenido del archivo.
+3. Un ACK de un byte enviado por el servidor.
+
+Valores del ACK:
+
+```text
+1 = transferencia exitosa
+0 = transferencia fallida
+```
+
+El nombre del archivo está limitado a 1024 bytes. El servidor utiliza solamente el nombre base y guarda el archivo como:
+
+```text
+received_<nombre_base>
+```
+
+El servidor valida que la cantidad de bytes recibidos coincida con el tamaño indicado en la cabecera.
+
+## Arquitectura
 
 ```text
 include/
-  cli.h
   buffer_diag.h
+  cli.h
   scanner.h
+  structs.h
   transfer.h
   utils.h
   platform/
     io.h
-    socket.h
     platform.h
+    socket.h
+
 src/
-  entrypoint.c
-  main.c
-  cli.c
   buffer_diag.c
+  cli.c
+  main.c
   scanner.c
   transfer.c
   utils.c
   platform/
     posix/
       io_posix.c
-      socket_posix.c
       platform_posix.c
+      socket_posix.c
     windows/
-      io_windows.c           (deferred placeholder)
-      socket_windows.c       (deferred placeholder)
-      platform_windows.c     (deferred placeholder)
+      io_windows.c
+      platform_windows.c
+      socket_windows.c
+
 tests/
   test_main.c
 ```
 
-Design goals:
-- small and maintainable code
-- platform-specific code concentrated in platform modules
-- no scattered OS checks in business logic
-- clear error messages and return-value checking
+La lógica principal se encuentra separada de las implementaciones específicas de la plataforma:
 
-## Tests
+- `buffer_diag.c`: benchmarks de lectura y copia.
+- `scanner.c`: escaneo de puertos TCP.
+- `transfer.c`: cliente y servidor de transferencia.
+- `cli.c`: comandos y menú interactivo.
+- `utils.c`: validaciones, parsers, throughput y checksum.
+- `platform/posix/`: implementación POSIX para archivos, sockets y temporización.
+- `platform/windows/`: placeholders para soporte futuro.
 
-Offline tests (no external network dependency) cover:
-- buffer size validation
-- buffer list/range parsing
-- host:port parsing
-- port range parsing
-- throughput math
-- checksum helper stability
+## Funciones auxiliares
 
-Run:
+El módulo de utilidades incluye:
+
+- Validación de tamaños de buffer.
+- Parseo de listas y rangos de buffers.
+- Parseo de rangos de puertos.
+- Parseo de endpoints con formato `host:port`.
+- Cálculo de rendimiento en MiB/s.
+- Cálculo de checksum FNV-1a de 32 bits.
+- Extracción del nombre base de una ruta.
+- Conversión de texto a enteros positivos.
+- Ordenamiento de resultados de puertos.
+
+## Pruebas
+
+Para ejecutar las pruebas:
 
 ```bash
 ctest --test-dir build --output-on-failure
 ```
 
-## Limitations
+Las pruebas cubren actualmente:
 
-- Current scanner is sequential for simplicity and maintainability.
-- IPv4-only TCP scanner and transfer in this version.
-- Windows backend intentionally deferred.
+- Validación de tamaños de buffer.
+- Parseo de listas de tamaños de buffer.
+- Parseo de rangos de buffers.
+- Parseo de rangos de puertos.
+- Validación de rangos inválidos.
+- Parseo de endpoints `host:port`.
+- Cálculo de throughput.
+- Estabilidad del checksum.
 
-## Future improvements
+También se puede ejecutar directamente el binario de pruebas:
 
-- Implement Windows platform backends (I/O, timing, sockets)
-- Optional bounded concurrency for scanner
-- Optional transfer resume and richer status reporting
-- Additional parser tests and protocol robustness checks
+```bash
+./build/datafluxdiag_tests
+```
+
+Salida esperada:
+
+```text
+All StreamDiag offline tests passed.
+```
+
+## Limitaciones actuales
+
+- Solo existe una implementación POSIX.
+- El escáner utiliza TCP sobre IPv4.
+- La transferencia utiliza TCP sobre IPv4.
+- El servidor procesa una conexión por ejecución.
+- No se implementa autenticación ni cifrado.
+- No se validan checksums durante la transferencia.
+- No existe soporte para reanudar transferencias.
+- El timeout efectivo del trabajador del escáner está fijado actualmente en 1000 ms.
+- El nombre mostrado en varios mensajes de la CLI sigue siendo `StreamDiag`, mientras que el proyecto y el ejecutable se llaman `DataFluxDiag`.
+
+## Posibles mejoras
+
+- Implementar los backends para Windows.
+- Añadir soporte para múltiples conexiones en el servidor.
+- Implementar reanudación de transferencias.
+- Mejorar la validación del protocolo.
+- Agregar más pruebas para errores de red, archivos y argumentos.
+- Añadir soporte opcional para escaneos con límites de concurrencia.
+
+## Licencia
+
+Consulta el archivo `LICENSE` incluido en el repositorio para conocer los términos de licencia del proyecto.
