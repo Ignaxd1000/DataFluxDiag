@@ -16,7 +16,6 @@ static int scan_worker(void *arg)
 
     int timed_out = 0;
     double latency_ms = 0.0;
-    int timeout_ms = 1000;
 
     if (sd_socket_create_tcp(&socket) != 0) {
         task->rc = -1;
@@ -28,7 +27,7 @@ static int scan_worker(void *arg)
         &socket,
         task->ipv4,
         task->port.port_number,
-        timeout_ms,
+        task->timeout_ms,
         &timed_out,
         &latency_ms
     );
@@ -81,6 +80,7 @@ int sd_scan_tcp_ports(const char *host,
     tasks[i].latency_ms = 0.0;
     tasks[i].rc = 0;
     tasks[i].timed_out = 0;
+    tasks[i].timeout_ms = timeout_ms;
 
     thrd_create(
         &threads[i],

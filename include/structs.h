@@ -13,6 +13,7 @@ typedef struct {
     port port;
     int rc;
     int timed_out;
+    int timeout_ms;
 } scan_task;    
 
 typedef struct {
