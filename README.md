@@ -276,8 +276,6 @@ PORT       STATE      LATENCY
 80         CLOSED     0.198 ms
 ```
 
-> Importante: la implementación actual del trabajador del escáner utiliza internamente un timeout fijo de 1000 ms. El valor recibido mediante `--timeout` se muestra y se valida desde la CLI, pero actualmente no modifica ese valor interno.
-
 > Utiliza el escáner únicamente contra hosts y redes que tengas autorización para analizar.
 
 ## Transferencia de archivos TCP
