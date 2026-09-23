@@ -11,13 +11,13 @@
 #include <string.h>
 
 static void print_help(void) {
-    printf("StreamDiag - CLI diagnostic tool\n\n");
+    printf("DataFluxDiag - CLI diagnostic tool\n\n");
     printf("Usage:\n");
-    printf("  streamdiag --help\n");
-    printf("  streamdiag buffer benchmark <file> [--copy-out <file>] [--buffers <list>]\n");
-    printf("  streamdiag scan <host> <start-end> [--timeout <ms>]\n");
-    printf("  streamdiag server --port <port>\n");
-    printf("  streamdiag send <host:port> <file>\n\n");
+    printf("  datafluxdiag --help\n");
+    printf("  datafluxdiag buffer benchmark <file> [--copy-out <file>] [--buffers <list>]\n");
+    printf("  datafluxdiag scan <host> <start-end> [--timeout <ms>]\n");
+    printf("  datafluxdiag server --port <port>\n");
+    printf("  datafluxdiag send <host:port> <file>\n\n");
     printf("Buffer list format examples:\n");
     printf("  512,1024,4096\n");
     printf("  1024-65536:1024\n");
@@ -32,7 +32,7 @@ static int run_interactive_menu(void) {
     char buffer_text[256];
 
     printf("========================================\n");
-    printf("             StreamDiag\n");
+    printf("             DataFluxDiag\n");
     printf("========================================\n");
     printf("1. Buffer Diagnostic\n");
     printf("2. TCP Socket Scanner\n");
@@ -148,7 +148,7 @@ int sd_cli_run(int argc, char **argv) {
         sizes[0] = SD_DEFAULT_BUFFER_SIZE;
 
         if (argc < 4 || strcmp(argv[2], "benchmark") != 0) {
-            fprintf(stderr, "Error: usage: streamdiag buffer benchmark <file> [options]\n");
+            fprintf(stderr, "Error: usage: datafluxdiag buffer benchmark <file> [options]\n");
             sd_platform_cleanup();
             return 1;
         }
@@ -182,7 +182,7 @@ int sd_cli_run(int argc, char **argv) {
         int timeout_ms = 1000;
 
         if (argc < 4) {
-            fprintf(stderr, "Error: usage: streamdiag scan <host> <start-end> [--timeout <ms>]\n");
+            fprintf(stderr, "Error: usage: datafluxdiag scan <host> <start-end> [--timeout <ms>]\n");
             sd_platform_cleanup();
             return 1;
         }
